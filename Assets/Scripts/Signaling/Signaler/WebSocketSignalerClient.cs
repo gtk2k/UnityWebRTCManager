@@ -30,11 +30,11 @@ namespace gtk2k.WebRTCSignaler
             return SignalerType.WebSocketClient;
         }
 
-        public WebSocketSignalerClient(string signalingURL)
+        public WebSocketSignalerClient(string signalingURL, SynchronizationContext ctx)
         {
             Debug.Log($"=== WebSocketSignalerClient constructor({signalingURL})");
 
-            ctx = SynchronizationContext.Current;
+            this.ctx = ctx;
             this.signalingURL  = signalingURL;
         }
 

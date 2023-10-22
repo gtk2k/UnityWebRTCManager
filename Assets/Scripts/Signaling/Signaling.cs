@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Unity.WebRTC;
 using UnityEngine;
 
@@ -12,16 +13,18 @@ namespace gtk2k.WebRTCSignaler
         public event Action<RTCIceCandidate, string> OnCand;
         public event Action<string, string> OnError;
 
+        private SynchronizationContext ctx;
         private string signalingURL;
         private ISignaler signaler;
         private ProtocolType protocolType;
         private string ipAddress;
         private int port;
 
-        public Signaling(ProtocolType protocolType, string ipAddress, int port)
+        public Signaling(ProtocolType protocolType, string ipAddress, int port, SynchronizationContext ctx)
         {
             Debug.Log($"=== Signaling constructor({protocolType}, {ipAddress}, {port})");
 
+            this.ctx = ctx;
             this.protocolType = protocolType;
             this.ipAddress = ipAddress;
             this.port = port;
@@ -35,7 +38,7 @@ namespace gtk2k.WebRTCSignaler
             {
                 case ProtocolType.WebSocket:
                     signalingURL = $"ws://{ipAddress}:{port}";
-                    signaler = new WebSocketSignalerClient(signalingURL);
+                    signaler = new WebSocketSignalerClient(signalingURL, ctx);
                     signaler.OnConnect += OnConnect;
                     signaler.OnDisconnect += OnDisconnect;
                     signaler.OnDesc += OnDesc;
@@ -43,7 +46,7 @@ namespace gtk2k.WebRTCSignaler
                     signaler.OnError += OnError;
                     break;
                 case ProtocolType.UDP:
-                    signaler = new UDPSignaler(ipAddress, port);
+                    signaler = new UDPSignaler(ipAddress, port, ctx);
                     signaler.OnConnect += OnConnect;
                     signaler.OnDisconnect += OnDisconnect;
                     signaler.OnDesc += OnDesc;
@@ -85,45 +88,61 @@ namespace gtk2k.WebRTCSignaler
 
         private void onConnect(string id = null)
         {
-            Debug.Log($"=== Signaling onConnect [{id}]");
+            ctx.Post(_ =>
+            {
 
-            OnConnect?.Invoke(id);
+                Debug.Log($"=== Signaling onConnect [{id}]");
+
+                OnConnect?.Invoke(id);
+            }, null);
         }
 
         private void onDisconnect(ushort code, string reason, string id = null)
         {
-            Debug.Log($"=== Signaling onDisconnect [{id}]");
+            ctx.Post(_ =>
+            {
+                Debug.Log($"=== Signaling onDisconnect [{id}]");
 
-            if (protocolType == ProtocolType.WebSocket && code == 1006 && signaler.GetSignalerType() == SignalerType.WebSocketClient)
-            {
-                signalerStop();
-                serverStart();
-            }
-            else
-            {
-                OnDisconnect?.Invoke(code, reason, id);
-            }
+                if (protocolType == ProtocolType.WebSocket && code == 1006 && signaler.GetSignalerType() == SignalerType.WebSocketClient)
+                {
+                    signalerStop();
+                    serverStart();
+                }
+                else
+                {
+                    OnDisconnect?.Invoke(code, reason, id);
+                }
+            }, null);
         }
 
         private void onDesc(RTCSessionDescription desc, string id = null)
         {
-            Debug.Log($"=== Signaling onDesc [{id}]");
+            ctx.Post(_ =>
+            {
+                Debug.Log($"=== Signaling onDesc [{id}]");
 
-            OnDesc?.Invoke(desc, id);
+                OnDesc?.Invoke(desc, id);
+            }, null);
         }
 
         private void onCand(RTCIceCandidate cand, string id = null)
         {
-            Debug.Log($"=== Signaling onCand [{id}]");
+            ctx.Post(_ =>
+            {
+                Debug.Log($"=== Signaling onCand [{id}]");
 
-            OnCand?.Invoke(cand, id);
+                OnCand?.Invoke(cand, id);
+            }, null);
         }
 
         private void onError(string errorMessage, string id = null)
         {
-            Debug.Log($"=== Signaling onError [{id}]");
+            ctx.Post(_ =>
+            {
+                Debug.Log($"=== Signaling onError [{id}]");
 
-            OnError?.Invoke(errorMessage, id);
+                OnError?.Invoke(errorMessage, id);
+            }, null);
         }
 
         public void Send(string id, ref RTCSessionDescription desc)

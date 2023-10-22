@@ -3,6 +3,8 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using Unity.VisualScripting;
 using Unity.WebRTC;
 using UnityEngine;
 
@@ -16,6 +18,7 @@ namespace gtk2k.WebRTCSignaler
         public event Action<RTCIceCandidate, string> OnCand;
         public event Action<string, string> OnError;
 
+        private SynchronizationContext ctx;
         private string ipAddress;
         private int port;
         private UdpClient connectionObserver;
@@ -32,7 +35,7 @@ namespace gtk2k.WebRTCSignaler
             return SignalerType.UDP;
         }
 
-        public UDPSignaler(string ipAddress, int port)
+        public UDPSignaler(string ipAddress, int port, SynchronizationContext ctx)
         {
             Debug.Log($"=== UDPSignaling constructor({ipAddress}, {port})");
 
@@ -48,7 +51,8 @@ namespace gtk2k.WebRTCSignaler
         }
 
         public void Start() { }
-        public void Stop() {
+        public void Stop()
+        {
             connectionObserver?.Close();
             connectionObserver = null;
             connectionNotifer?.Close();
@@ -69,8 +73,17 @@ namespace gtk2k.WebRTCSignaler
         {
             Debug.Log($"=== UDPSignaling OnConnectionNotify");
 
-            var ep = new IPEndPoint(0, 0);
+            if (connectionObserver == null) return;
+            var ep = new IPEndPoint(IPAddress.Any, 0);
             connectionObserver.EndReceive(ar, ref ep);
+            var ips = Dns.GetHostAddresses(Dns.GetHostName());
+            foreach (var ip in ips)
+            {
+                if (ep.Address.Equals(ip))
+                {
+                    return;
+                }
+            }
             OnConnect?.Invoke(ep.Address.ToString());
             connectionObserver.BeginReceive(OnConnectionNotify, null);
         }

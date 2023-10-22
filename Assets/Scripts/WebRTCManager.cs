@@ -1,6 +1,7 @@
 using Assets.Scripts;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Unity.WebRTC;
 using UnityEngine;
 using UnityEngine.Events;
@@ -22,6 +23,7 @@ namespace gtk2k.WebRTCSignaler
         public UnityEvent<string, Texture> OnVideoTexture;
         public UnityEvent<string, float[], int, int> OnAudioData;
 
+        private SynchronizationContext ctx;
         private IVideCapture videoCapture;
         private Signaling signaling;
         private Dictionary<string, Peer> peers;
@@ -34,6 +36,8 @@ namespace gtk2k.WebRTCSignaler
         void Start()
         {
             Debug.Log($"=== WebRTCManager Start()");
+
+            ctx = SynchronizationContext.Current;
 
             StartCoroutine(WebRTC.Update());
 
@@ -70,7 +74,7 @@ namespace gtk2k.WebRTCSignaler
         {
             Debug.Log($"=== WebRTCManager Connect()");
 
-            signaling = new Signaling(signalingProtocolType, signalingIPAddress, signalingPort);
+            signaling = new Signaling(signalingProtocolType, signalingIPAddress, signalingPort, ctx);
             signaling.OnConnect += Signaling_OnConnect;
             signaling.OnDesc += Signaling_OnDesc;
             signaling.OnCand += Signaling_OnCand;
