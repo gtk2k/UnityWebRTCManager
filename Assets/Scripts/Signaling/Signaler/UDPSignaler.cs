@@ -75,7 +75,8 @@ namespace gtk2k.WebRTCSignaler
 
             if (connectionObserver == null) return;
             var ep = new IPEndPoint(IPAddress.Any, 0);
-            connectionObserver.EndReceive(ar, ref ep);
+            var data =  connectionObserver.EndReceive(ar, ref ep);
+            var msg = Encoding.ASCII.GetString(data);
             var ips = Dns.GetHostAddresses(Dns.GetHostName());
             foreach (var ip in ips)
             {
@@ -96,6 +97,7 @@ namespace gtk2k.WebRTCSignaler
             var broadcastEp = new IPEndPoint(IPAddress.Broadcast, port + 1);
             connectionNotifer = new UdpClient();
             connectionNotifer.EnableBroadcast = true;
+            Debug.Log($"=== Notify Send");
             connectionNotifer.BeginSend(connectData, connectData.Length, broadcastEp, OnBroadcast, null);
         }
 
