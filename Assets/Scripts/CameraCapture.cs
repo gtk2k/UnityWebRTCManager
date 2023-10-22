@@ -13,7 +13,8 @@ namespace Assets.Scripts
             return tex;
         }
 
-        public CameraCapture(Camera cam, int width, int height) { 
+        public CameraCapture(Camera cam, int width, int height) {
+            Debug.Log($"=== CameraCapture > width; {width}, {height}");
             this.cam = cam;
             tex = new RenderTexture(width, height, 24, RenderTextureFormat.BGRA32, 0);
             

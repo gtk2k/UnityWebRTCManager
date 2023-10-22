@@ -61,11 +61,16 @@ namespace gtk2k.WebRTCSignaler
             peers = new Dictionary<string, Peer>();
         }
 
+        private void Update()
+        {
+            videoCapture?.Update();
+        }
+
         public void Connect()
         {
             Debug.Log($"=== WebRTCManager Connect()");
 
-            signaling = new Signaling(ProtocolType.WebSocket, signalingIPAddress, signalingPort);
+            signaling = new Signaling(signalingProtocolType, signalingIPAddress, signalingPort);
             signaling.OnConnect += Signaling_OnConnect;
             signaling.OnDesc += Signaling_OnDesc;
             signaling.OnCand += Signaling_OnCand;

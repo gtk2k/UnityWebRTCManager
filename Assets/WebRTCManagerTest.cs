@@ -13,6 +13,11 @@ public class WebRTCManagerTest : MonoBehaviour
         webRTCManager.Connect();
     }
 
+    private void OnDisable()
+    {
+        webRTCManager?.Close();
+    }
+
     private void OnVideoTexture(string id, Texture tex)
     {
         var go = GameObject.CreatePrimitive(PrimitiveType.Quad);

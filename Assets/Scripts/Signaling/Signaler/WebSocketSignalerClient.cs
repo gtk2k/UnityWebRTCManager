@@ -32,7 +32,7 @@ namespace gtk2k.WebRTCSignaler
 
         public WebSocketSignalerClient(string signalingURL)
         {
-            Debug.Log($"=== SignalingClient constructor({signalingURL})");
+            Debug.Log($"=== WebSocketSignalerClient constructor({signalingURL})");
 
             ctx = SynchronizationContext.Current;
             this.signalingURL  = signalingURL;
@@ -40,7 +40,7 @@ namespace gtk2k.WebRTCSignaler
 
         public void Start()
         {
-            Debug.Log($"=== SignalingClient Start()");
+            Debug.Log($"=== WebSocketSignalerClient Start()");
 
             ws = new WebSocket(signalingURL);
             ws.OnError += Ws_OnError;
@@ -52,7 +52,7 @@ namespace gtk2k.WebRTCSignaler
 
         public void Stop()
         {
-            Debug.Log($"=== SignalingClient Stop()");
+            Debug.Log($"=== WebSocketSignalerClient Stop()");
 
             ws?.Close();
             ws = null;
@@ -60,7 +60,7 @@ namespace gtk2k.WebRTCSignaler
 
         private void Ws_OnOpen(object sender, EventArgs e)
         {
-            Debug.Log($"=== SignalingClient Ws_OnOpen()");
+            Debug.Log($"=== WebSocketSignalerClient Ws_OnOpen()");
 
             ctx.Post(_ =>
             {
@@ -70,7 +70,7 @@ namespace gtk2k.WebRTCSignaler
 
         private void Ws_OnMessage(object sender, MessageEventArgs e)
         {
-            Debug.Log($"=== SignalingClient Ws_OnMessage()");
+            Debug.Log($"=== WebSocketSignalerClient Ws_OnMessage()");
 
             ctx.Post(_ =>
             {
@@ -85,7 +85,7 @@ namespace gtk2k.WebRTCSignaler
 
         private void Ws_OnClose(object sender, CloseEventArgs e)
         {
-            Debug.Log($"=== SignalingClient Ws_OnClose()");
+            Debug.Log($"=== WebSocketSignalerClient Ws_OnClose()");
 
             ctx.Post(_ =>
             {
@@ -95,7 +95,7 @@ namespace gtk2k.WebRTCSignaler
 
         private void Ws_OnError(object sender, ErrorEventArgs e)
         {
-            Debug.Log($"=== SignalingClient Ws_OnError()");
+            Debug.Log($"=== WebSocketSignalerClient Ws_OnError()");
 
             ctx.Post(_ =>
             {
@@ -105,21 +105,21 @@ namespace gtk2k.WebRTCSignaler
 
         public void Send(string id, ref RTCSessionDescription desc)
         {
-            Debug.Log($"=== SignalingClient Send(desc) [{id}]");
+            Debug.Log($"=== WebSocketSignalerClient Send(desc) [{id}]");
 
             Send(SignalingMessage.fromDesc(ref desc));
         }
 
         public void Send(string id, RTCIceCandidate cand)
         {
-            Debug.Log($"=== SignalingClient Send(cand) [{id}]");
+            Debug.Log($"=== WebSocketSignalerClient Send(cand) [{id}]");
 
             Send(SignalingMessage.fromCand(cand));
         }
 
         private void Send(SignalingMessage msg)
         {
-            Debug.Log($"=== SignalingClient Send(signalingMessage)");
+            Debug.Log($"=== WebSocketSignalerClient Send(signalingMessage)");
 
             var data = JsonConvert.SerializeObject(msg, jsonSettings);
             ws.Send(data);

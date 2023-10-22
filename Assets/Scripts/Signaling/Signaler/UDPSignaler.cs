@@ -48,7 +48,14 @@ namespace gtk2k.WebRTCSignaler
         }
 
         public void Start() { }
-        public void Stop() { }
+        public void Stop() {
+            connectionObserver?.Close();
+            connectionObserver = null;
+            connectionNotifer?.Close();
+            connectionNotifer = null;
+            signaler.Close();
+            signaler = null;
+        }
 
         private void setupConnectionObserver()
         {
@@ -74,6 +81,7 @@ namespace gtk2k.WebRTCSignaler
 
             var connectData = Encoding.ASCII.GetBytes("connect");
             var broadcastEp = new IPEndPoint(IPAddress.Broadcast, port + 1);
+            connectionNotifer = new UdpClient();
             connectionNotifer.EnableBroadcast = true;
             connectionNotifer.BeginSend(connectData, connectData.Length, broadcastEp, OnBroadcast, null);
         }

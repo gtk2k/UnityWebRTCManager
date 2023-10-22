@@ -355,7 +355,7 @@ MonoBehaviour:
   signalingProtocolType: 0
   signalingIPAddress: 
   signalingPort: 8888
-  isSendVideoStreaming: 0
+  isSendVideoStreaming: 1
   isSendAudioStreaming: 0
   streamingCamera: {fileID: 0}
   streamingWidth: 1280
