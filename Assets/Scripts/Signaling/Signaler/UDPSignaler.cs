@@ -110,8 +110,10 @@ namespace gtk2k.WebRTCSignaler
 
             try
             {
+                if (signaler == null) return;
                 var ep = new IPEndPoint(0, 0);
                 var rawData = signaler.EndReceive(ar, ref ep);
+                Debug.Log($"=== rawDeata:{rawData.Length}");
                 if (ipAddress != null)
                 {
                     if (ep.Address.ToString() != ipAddress)
