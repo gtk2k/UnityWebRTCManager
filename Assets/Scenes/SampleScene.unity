@@ -352,8 +352,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2b4ed9ba3d8f345b004131e8c01937, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  signalingProtocolType: 0
-  signalingIPAddress: 
+  signalingProtocolType: 1
+  signalingIPAddress: 192.168.12.251
   signalingPort: 8888
   isSendVideoStreaming: 1
   isSendAudioStreaming: 0

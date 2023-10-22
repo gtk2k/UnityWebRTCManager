@@ -47,7 +47,8 @@ namespace gtk2k.WebRTCSignaler
             ws.OnClose += Ws_OnClose;
             ws.OnMessage += Ws_OnMessage;
             ws.OnOpen += Ws_OnOpen;
-            ws.Connect();
+            ws.WaitTime = TimeSpan.FromSeconds(1);
+            ws.ConnectAsync();
         }
 
         public void Stop()
@@ -60,20 +61,20 @@ namespace gtk2k.WebRTCSignaler
 
         private void Ws_OnOpen(object sender, EventArgs e)
         {
-            Debug.Log($"=== WebSocketSignalerClient Ws_OnOpen()");
-
             ctx.Post(_ =>
             {
+                Debug.Log($"=== WebSocketSignalerClient Ws_OnOpen()");
+
                 OnConnect?.Invoke(null);
             }, null);
         }
 
         private void Ws_OnMessage(object sender, MessageEventArgs e)
         {
-            Debug.Log($"=== WebSocketSignalerClient Ws_OnMessage()");
-
             ctx.Post(_ =>
             {
+                Debug.Log($"=== WebSocketSignalerClient Ws_OnMessage()");
+
                 var msg = JsonConvert.DeserializeObject<SignalingMessage>(e.Data);
                 switch (msg.type)
                 {
@@ -85,20 +86,20 @@ namespace gtk2k.WebRTCSignaler
 
         private void Ws_OnClose(object sender, CloseEventArgs e)
         {
-            Debug.Log($"=== WebSocketSignalerClient Ws_OnClose()");
-
             ctx.Post(_ =>
             {
+                Debug.Log($"=== WebSocketSignalerClient Ws_OnClose()");
+
                 OnDisconnect?.Invoke(e.Code, e.Reason, null);
             }, null);
         }
 
         private void Ws_OnError(object sender, ErrorEventArgs e)
         {
-            Debug.Log($"=== WebSocketSignalerClient Ws_OnError()");
-
             ctx.Post(_ =>
             {
+                Debug.Log($"=== WebSocketSignalerClient Ws_OnError()");
+
                 OnError?.Invoke(e.Message, null);
             }, null);
         }

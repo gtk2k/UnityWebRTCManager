@@ -54,6 +54,7 @@ namespace gtk2k.WebRTCSignaler
                     signaler.OnError += OnError;
                     break;
             }
+            signaler.Start();
         }
 
         public void Disconnect()
